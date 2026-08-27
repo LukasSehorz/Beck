@@ -1,0 +1,501 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   Beck Fenster — Design-System nach fluid.glass
+   Verbindliche Vorlage: ../_assets/DESIGN-SYSTEM.md + ../.ref/shots/fg-*.png
+
+   Kernprinzipien:
+   1. Hintergrund durchgehend Creme #f3f0ec, nie weiß
+   2. border-radius: 0 überall — nur Pills bekommen 2rem
+   3. Sans/Mono-Kontrast: Headlines groß + eng, Labels Mono/UPPERCASE/gesperrt
+   4. Fluid Sizing: alles skaliert linear mit der Viewportbreite
+   ========================================================================= */
+
+@theme {
+  /* ---- Farben (exakt aus fluid.glass :root) ---- */
+  --color-black: #0b1012;
+  --color-cream: #f3f0ec;
+  --color-taupe: #d4cec6;
+  --color-grey: #212325;
+  --color-white: #ffffff;
+
+  /* ---- Schrift ----
+     Freie Zwillinge für Aeonik Pro / Aeonik Mono. Der Tausch gegen echtes
+     Aeonik erfolgt später allein über diese beiden Variablen — die Fallbacks
+     dahinter sind unabhängig von der konkreten Google-Font. */
+  --font-sans: var(--font-beck-sans), "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-beck-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---- Easing (aus fluid.glass) ---- */
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+/* =========================================================================
+   Fluid Sizing
+   fluid.glass rechnet --font-s: calc((100vw / 1600) * 10) und leitet alle
+   Größen daraus ab. Rein linear würde auf 360px alles unlesbar klein und auf
+   sehr breiten Schirmen unkontrolliert groß — deshalb hier über clamp() mit
+   demselben vw-Anteil, aber mit Unter- und Obergrenze.
+   ========================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* Seitliches Außenmaß. fluid.glass setzt links/rechts denselben schmalen
+     Rand — Bilder brechen bewusst daraus aus. */
+  --gutter: clamp(1.25rem, 2.5vw, 2.25rem);
+
+  /* Höhe der schwebenden Nav-Pill inkl. Abstand zum Viewportrand — Sektionen,
+     die bis unten laufen, halten damit unten Platz frei.
+     Gegen fluid.glass gemessen: Leiste 248 × 45 px, 36 px über der Unterkante. */
+  --pill-h: 45px;
+  --pill-gap: 36px;
+}
+
+html {
+  /* Lenis übernimmt das Scrollen – natives Smooth-Scroll würde kollidieren */
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-black);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  /* `clip` statt `hidden`: verhindert horizontalen Overflow, ohne position:sticky
+     in Kindelementen (Scroll-Zoom-Pinning) zu brechen. */
+  overflow-x: clip;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+::selection {
+  background-color: var(--color-black);
+  color: var(--color-cream);
+}
+
+/* Fokus nur für Tastaturnutzung sichtbar. radius 0 — wie alles andere. */
+:focus-visible {
+  outline: 2px solid var(--color-black);
+  outline-offset: 3px;
+  border-radius: 0;
+}
+
+/* Auf dunklen Flächen braucht der Fokusring die Gegenfarbe. */
+.on-dark :focus-visible {
+  outline-color: var(--color-cream);
+}
+
+/* =========================================================================
+   Typografie-Skala
+   Werte aus DESIGN-SYSTEM.md § 2, umgerechnet von der 10px-Basis des
+   Originals (dort 1rem = 10px) auf die 16px-Basis dieses Projekts.
+   ========================================================================= */
+
+/* Riesen-Display — Footer-Wasserzeichen (Original 19.2rem = 192px) */
+.t-display {
+  font-size: clamp(3.5rem, 13vw, 12rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+
+/* Section-Headline.
+   fluid.glass misst 57,6 px bei 1440 px — dieselbe Zahl hier wirkt aber
+   schwerer, weil Schibsted Grotesk breiter läuft als Aeonik Pro: 26,7 px pro
+   Zeichen gegen 23,4 px der Vorlage. 3,6vw ergibt 51,8 px und damit ≈24,0 px
+   pro Zeichen — gleiche optische Größe statt gleicher Zahl.
+   Untergrenze 2rem, damit auf 390 px die letzte Zeile der Über-Headline nicht
+   hinter die Nav-Pill läuft. */
+.t-h1 {
+  font-size: clamp(2rem, 3.6vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 400;
+  /* Display-Größen trennen nie automatisch: auf 390 px brach `hyphens: auto`
+     „als GmbH – ge-/führt" mitten in einer 32-px-Zeile. Umbrüche entstehen
+     hier ausschließlich an Wortfugen (bzw. an gesetzten weichen Trennstrichen). */
+  hyphens: manual;
+  overflow-wrap: normal;
+}
+
+/* Große Headline — Produktnamen auf den Kacheln. fluid.glass: 36 px bei
+   1440 px. Bei 48 px trennte `hyphens: auto` „Hebeschie-türen" falsch. */
+.t-h2 {
+  font-size: clamp(1.75rem, 2.5vw, 2.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  /* Deutsche Komposita: erst korrekt trennen (mit Trennstrich, html lang="de"),
+     break-word nur als letzte Rettung – sonst bricht "Sonnenschutz" mitten
+     im Wort ohne Trennzeichen. */
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+/* Sub-Headline — Projektnamen, Teamnamen. fluid.glass: 21,6 px bei 1440 px.
+   Größer brechen „Lortzing- & Scapinellistraße" und „Kindergarten
+   Langenpreising" zweizeilig und der Listenrhythmus geht verloren. */
+.t-h3 {
+  font-size: clamp(1.25rem, 1.5vw, 1.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+
+/* Fließtext groß (Original 2rem = 20px) */
+.t-body-lg {
+  font-size: clamp(1rem, 1.15vw, 1.25rem);
+  line-height: 1.3;
+  font-weight: 400;
+}
+
+/* Fließtext (Original 1.6rem = 16px) */
+.t-body {
+  font-size: clamp(0.9375rem, 1vw, 1rem);
+  line-height: 1.3;
+  font-weight: 400;
+}
+
+/* ---- Mono-Ebene ----
+   Trägt zusammen mit den engen Sans-Headlines das ganze Design.
+   Immer UPPERCASE, immer gesperrt. */
+
+/* Gegen fluid.glass gemessen: 12,6 px, Gewicht 600, Sperrung 0,1em und
+   deckende Farbe (≈14:1). Die vorherigen 10,4 px bei 500/0,55 Alpha lagen
+   mit 4,0:1 unter der AA-Schwelle von 4,5:1. */
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: clamp(0.75rem, 0.875vw, 0.9rem);
+  line-height: 1.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Etwas größere Mono-Variante — Adressblöcke, Tabellenzellen */
+.t-mono-md {
+  font-family: var(--font-mono);
+  font-size: clamp(0.6875rem, 0.8vw, 0.8125rem);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  font-weight: 400;
+}
+
+/* Section-Label mit vorangestelltem Rhombus — „◆ PRODUCT COLLECTION" */
+.t-label::before {
+  content: "◆";
+  display: inline-block;
+  margin-right: 0.9em;
+  /* Der Rhombus sitzt in der Schrift zu hoch und wirkt zu groß */
+  font-size: 0.85em;
+  vertical-align: 0.05em;
+}
+
+/* =========================================================================
+   Buttons — eckige Mono-Kästchen mit ↳-Pfeil (fg-02, fg-03, fg-11)
+   ========================================================================= */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85em;
+  /* Gegen fluid.glass gemessen: 252 × 37 px. Die Vorlage setzt den Kasten
+     deutlich breiter als hoch — 1,35em Seitenpolster waren 35 % zu eng. */
+  padding: 1.25em 2em;
+  border-radius: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(0.65rem, 0.75vw, 0.78rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color 0.4s var(--ease-out-quart),
+    color 0.4s var(--ease-out-quart);
+}
+
+/* Der ↳-Pfeil steht bei fluid.glass vor dem Label und rückt beim Hover vor. */
+.btn::before {
+  content: "↳";
+  display: inline-block;
+  font-size: 1.15em;
+  line-height: 1;
+  transition: transform 0.4s var(--ease-out-quart);
+}
+
+.btn:hover::before {
+  transform: translateX(0.25em);
+}
+
+/* Primär: schwarzer Grund, cremeweiße Mono-Versalien */
+.btn-primary {
+  background-color: var(--color-black);
+  color: var(--color-cream);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-grey);
+}
+
+/* Sekundär: heller Grund, dunkle Schrift (fg-06 „SHOWROOM") */
+.btn-secondary {
+  background-color: var(--color-taupe);
+  color: var(--color-black);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-black);
+  color: var(--color-cream);
+}
+
+/* Auf dunklen Bildflächen: halbtransparent weiß */
+.btn-ghost-light {
+  background-color: rgb(255 255 255 / 0.14);
+  color: var(--color-white);
+  backdrop-filter: blur(6px);
+}
+
+.btn-ghost-light:hover {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+/* Reiner Textlink im Buttonduktus — „↳ GET IN TOUCH" (fg-11) */
+.btn-text {
+  padding: 1.25em 0;
+  background: none;
+  color: var(--color-black);
+}
+
+.btn-text:hover {
+  opacity: 0.55;
+}
+
+/* =========================================================================
+   Pills — die einzige Ausnahme von border-radius: 0 (fg-08)
+   ========================================================================= */
+
+.pill {
+  display: inline-block;
+  border: 1px solid color-mix(in srgb, var(--color-black) 22%, transparent);
+  /* fluid.glass gemessen: 18px bei 23px Pillhöhe – kein volles Halbrund. */
+  border-radius: 18px;
+  padding: 0.5em 1em;
+  font-family: var(--font-mono);
+  font-size: clamp(0.5625rem, 0.66vw, 0.6875rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 400;
+  line-height: 1.2;
+  color: color-mix(in srgb, var(--color-black) 70%, transparent);
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   Linien — dünne Trenner über die volle Breite (fg-02, fg-08, fg-10)
+   ========================================================================= */
+
+.rule {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--color-black) 14%, transparent);
+}
+
+.rule-light {
+  border: 0;
+  border-top: 1px solid rgb(255 255 255 / 0.28);
+}
+
+/* =========================================================================
+   Zeilenweise Text-Reveal (Maskenanimation)
+   ========================================================================= */
+
+.reveal-line {
+  display: block;
+  overflow: hidden;
+  /* Unter-/Oberlängen dürfen nicht abgeschnitten werden */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.reveal-line > span {
+  display: block;
+  will-change: transform;
+}
+
+/* Startzustand nur setzen, wenn JS die Animation auch ausführt. Ohne JS (oder
+   bei reduzierter Bewegung) bleibt der Text sichtbar.
+
+   Bewusst KEIN `transform` hier: GSAP animiert `yPercent` und würde einen
+   bereits gesetzten Transform als Nullpunkt interpretieren – der Text bliebe
+   dann um seine eigene Höhe versetzt hinter der Maske stehen. */
+.js-reveal-ready .reveal-line > span {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal-ready .reveal-line > span {
+    visibility: visible;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =========================================================================
+   Datentabellen im Mono-Stil (Hersteller-Unterseiten)
+   ========================================================================= */
+
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.spec-table th {
+  font-family: var(--font-mono);
+  font-size: clamp(0.5625rem, 0.68vw, 0.6875rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--color-black) 55%, transparent);
+  padding: 0 1.25rem 0.9rem 0;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-black) 22%, transparent);
+  vertical-align: bottom;
+}
+
+.spec-table td {
+  padding: 1.15rem 1.25rem 1.15rem 0;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-black) 10%, transparent);
+  vertical-align: top;
+  font-size: clamp(0.8125rem, 0.92vw, 0.9375rem);
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-black) 78%, transparent);
+}
+
+/* Erste Spalte = Modellname: Sans, dunkel, damit die Zeile einen Anker hat */
+.spec-table td:first-child {
+  color: var(--color-black);
+  white-space: nowrap;
+}
+
+/* Messwerte (U-Wert, Bautiefe, dB) in Mono — sie sollen als Daten lesbar sein */
+.spec-table .num {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   Rechtstexte (Impressum, Datenschutz)
+   ========================================================================= */
+
+.legal-prose h2 {
+  font-family: var(--font-sans);
+  font-size: clamp(1.125rem, 1.6vw, 1.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  color: var(--color-black);
+  margin-top: 3.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-black) 14%, transparent);
+}
+
+.legal-prose > *:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.legal-prose h3 {
+  font-family: var(--font-mono);
+  font-size: clamp(0.625rem, 0.72vw, 0.75rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-black);
+  margin-top: 2rem;
+}
+
+.legal-prose p,
+.legal-prose li {
+  font-size: clamp(0.875rem, 0.95vw, 0.9375rem);
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--color-black) 72%, transparent);
+}
+
+.legal-prose p,
+.legal-prose ul,
+.legal-prose address {
+  margin-top: 1rem;
+}
+
+.legal-prose ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.legal-prose li {
+  margin-top: 0.4rem;
+}
+
+.legal-prose address {
+  font-style: normal;
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--color-black) 72%, transparent);
+}
+
+.legal-prose a {
+  color: var(--color-black);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, var(--color-black) 30%, transparent);
+  transition: opacity 0.3s;
+}
+
+.legal-prose a:hover {
+  opacity: 0.6;
+}
+
+/* Noch zu ergänzende Pflichtangaben sichtbar markieren, damit sie vor dem
+   Livegang nicht übersehen werden. Bewusst auffällig — kein Creme, kein
+   radius 0-Purismus: dieser Marker soll stören. */
+.todo {
+  display: inline-block;
+  background-color: var(--color-black);
+  color: var(--color-cream);
+  padding: 0.15em 0.5em;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}

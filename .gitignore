@@ -1,0 +1,40 @@
+# Abhängigkeiten und Build-Ausgaben
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Rohmaterial und Recherche — bleiben lokal.
+# _assets: Veo-Rohvideos, GPT-Quellbilder, alle Downloads von der alten
+#          Beck-Seite (~2,5 GB). Die daraus abgeleiteten, web-optimierten
+#          Dateien liegen in beck-web/public und sind versioniert.
+# .ref:    kompletter Scrape der Referenzseite fluid.glass samt deren Bildern
+#          (fremdes Material, gehört nicht ins Repo).
+_assets/*
+!_assets/*.md
+.ref/
+.firecrawl/
+
+# Umgebung
+.env
+.env*.local
+
+# Logs und Caches
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+*.tsbuildinfo
+next-env.d.ts
+
+# Betriebssystem und Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Beiseitegelegtes Alt-Repo von create-next-app (nur der Scaffold-Commit)
+.git.disabled/
