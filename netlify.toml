@@ -3,8 +3,10 @@
 [build]
   base = "beck-web"
   command = "npm run build"
-  # Relativ zu `base` – Netlify erwartet den Pfad ab dem Repo-Wurzelverzeichnis.
-  publish = "beck-web/.next"
+  # Achtung: `publish` ist relativ zu `base`, nicht zum Repo-Wurzelverzeichnis.
+  # "beck-web/.next" löste sich zu beck-web/beck-web/.next auf und ließ das
+  # Next-Plugin scheitern.
+  publish = ".next"
 
 [build.environment]
   # Next.js 16 setzt Node 20+ voraus.
