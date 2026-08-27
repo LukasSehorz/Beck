@@ -1,0 +1,17 @@
+# Die Anwendung liegt im Unterordner beck-web, nicht im Repo-Wurzelverzeichnis.
+# Ohne `base` baut Netlify die leere Wurzel und liefert für jede Route 404.
+[build]
+  base = "beck-web"
+  command = "npm run build"
+  # Relativ zu `base` – Netlify erwartet den Pfad ab dem Repo-Wurzelverzeichnis.
+  publish = "beck-web/.next"
+
+[build.environment]
+  # Next.js 16 setzt Node 20+ voraus.
+  NODE_VERSION = "20"
+
+# Übernimmt das Routing (App Router, next/image, Server-Rendering).
+# Ohne dieses Plugin liefert Netlify nur statische Dateien und findet die
+# Routen der App nicht.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
